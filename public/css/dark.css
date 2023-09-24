@@ -1,0 +1,35 @@
+th {
+    background-color: black;
+}
+
+table.dark-mode {
+    border-color: gray;
+}
+
+td.dark-mode {
+    border-color: gray;
+}
+
+body.dark-mode {
+    background-color: #222;
+    color: #fff;
+}
+
+#mainContainer.dark-mode {
+    border-color: #666;
+    background-color: #333;
+}
+
+#mediaDiv.dark-mode {
+    border-color: #666;
+    border: 1px solid #ccc;
+}
+
+#infoContainer.dark-mode {
+    border-color: #666;
+}
+
+.infoItem.dark-mode {
+    background-color: #444;
+    border-color: #666;
+}

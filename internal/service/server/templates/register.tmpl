@@ -1,0 +1,40 @@
+<div id="register">
+    <h3>Register</h3>
+    <form hx-post="/register" hx-ext='json-enc' hx-target="#mainContainer" hx-swap="innerHTML">
+        <table>
+            <tr>
+                <td><label for="username">Username:</label></td>
+                <td><input id="username" type="text" placeholder="Username" name="user_name" value="{{ .UserName }}" required></td>
+            </tr>
+            {{if ne .DisplayNameError "" }}
+                <tr>
+                    <span>{{ .DisplayNameError }}</span>
+                </tr>
+            {{end}}
+            <tr>
+                <td><label for="password">Password:</label></td>
+                <td><input id="password" type="password" placeholder="Password" name="password" required></td>
+            </tr>
+             {{if ne .PasswordError "" }}
+                <tr>
+                    <span>{{ .PasswordError }}</span>
+                </tr>
+            {{end}}
+            <tr>
+                <td><label for="passwordagain">Verify Password:</label></td>
+                <td><input id="passwordagain" type="password" placeholder="Verify Password" name="verify_password" required></td>
+            </tr>
+            <tr>
+                <td><label for="realname">Name:</label></td>
+                <td><input id="realname" type="text" placeholder="Real Name" name="real_name" value="{{ .RealName }}" required></td>
+            </tr>
+            <tr>
+                <td><label for="email">Email:</label></td>
+                <td><input id="email" type="text" placeholder="user@email.com" name="email" value="{{ .Email }}" required></td>
+            </tr>
+            <tr>
+                <td colspan="2"><button type="submit">Register</button></td>
+            </tr>
+        </table>
+    </form>
+</div>

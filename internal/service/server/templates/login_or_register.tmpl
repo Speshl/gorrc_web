@@ -1,0 +1,16 @@
+<div id="loginOrRegister">
+    <h3>Login</h3>
+
+    {{ if ne .LoginError "" }}
+        <span>{{ .LoginError }}</span>
+    {{end}}
+
+    <form hx-post="/login" hx-ext='json-enc' hx-target="#mainContainer" hx-swap="innerHTML">
+        <input type="text" placeholder="Enter Username" name="username" required>
+        <input type="password" placeholder="Enter Password" name="password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <span>OR</span>
+    <div><input id="register" type="button" value="Register" hx-get="/show_register" hx-target="#mainContainer" hx-swap="innerHTML"></div>
+</div>

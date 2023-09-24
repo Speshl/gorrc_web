@@ -1,0 +1,161 @@
+  body {
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    display: grid;
+    justify-content: center; /* Center horizontally */
+}
+
+html {
+    height: 100%;
+}
+
+h1 {
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+}
+
+table {
+    width: 100%;
+}
+
+tbody {
+    border-width: 1px;
+}
+
+#mainContainer {
+    text-align: center;
+    padding: 20px;
+    width: 65vw;
+    margin: 0 auto;
+    border: 1px solid;
+    aspect-ratio: 16/9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 640px;
+    min-height: 360px;
+}
+
+#mediaDiv {
+    visibility: hidden;
+    width: 0%;
+    height: 0%;
+}
+
+/* #canvasDiv {
+    width: 60vw;
+    margin: 0 auto;
+    border: 1px solid;
+    aspect-ratio: 16/9;
+} */
+
+#videoElement {
+    width: 0vw;
+    /* margin: 0 auto;
+    border: 1px solid; */
+    aspect-ratio: 16/9;
+    visibility: hidden;
+}
+
+#audioElement {
+    width: 0vw;
+    visibility: hidden;
+}
+
+#videoCanvas {
+    width: 100%;
+    aspect-ratio: 16/9;
+}
+
+#infoContainer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+}
+
+#driveCar {
+    grid-column: 1/3;
+}
+
+#trackList {
+    width:100%;
+    height:100%;
+    position: relative;
+    border-width: 1px;
+}
+
+#scrollDiv {
+    overflow-y: auto;
+    height: 75%;
+    width: 100%;
+}
+
+ #selectTrackDiv {
+    display: inline-block
+} 
+
+#carList {
+    width:100%;
+    height:100%;
+    position: relative;
+    border-width: 1px;
+}
+
+#selectCarDiv {
+    display: inline-block;
+}
+
+#backTrackList {
+    display: inline-block;
+}
+
+#bottomNavDiv {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tracklogo {
+    width: 50px;
+    height: 50px;
+}
+
+.selectedTrack {
+    border-color: green;
+    border-width: 1px;
+}
+
+.selectedCar {
+    border-color: green;
+    border-width: 1px;
+}
+
+.infoItem {
+    padding: 5px;
+    text-align: center;
+}
+
+.hiddenInfoItem {
+    visibility: hidden;
+    display: none;
+}
+
+.list {
+    width: 100%;
+    border: 1px solid;
+    padding: 20px;
+}
+
+.listRow {
+    border: 1px solid;
+}
+
+.listData {
+    padding: 5px;
+}

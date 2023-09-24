@@ -1,0 +1,20 @@
+https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/docker-mysql-getting-started.html
+
+docker pull container-registry.oracle.com/mysql/community-server:latest
+
+docker run --name=mysql1 --restart on-failure -d -p 3306:3306 container-registry.oracle.com/mysql/community-server:latest
+
+#this will show the auto generated password for first login: 2TgG*13;JnQiJb:D7#w+h7#43Ni+k6D=
+docker logs mysql1 2>&1 | grep GENERATED
+
+#Use password from above to login to sql client in the docker container
+docker exec -it mysql1 mysql -uroot -p
+
+#Use this sql command to change the root password
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'password';
+
+#Create admin that can run out of the container
+CREATE USER 'speshl'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'speshl'@'%';
+
+

@@ -1,0 +1,34 @@
+<div id="trackList">
+    <h3>Select A Track</h3>
+    <div id="scrollDiv">
+        <table>
+            <tr>
+                <th colspan=2>Track</th>
+                <th>Cars</th>
+                <th>Drivers</th>
+                <th>Spectators</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            {{ range $i, $track := .Tracks }}
+                <tr id="trackEntry{{$i}}" onclick="selectTrack(this);" hx-get="/track_select?track={{$track.ShortName}}" hx-target="#selectTrackDiv" hx-swap="outerHTML" hx-trigger="trackSelected">
+                    <td style="text-align: left;">
+                        <img class="tracklogo" src="{{$track.Logo}}">
+                    </td>
+                    <td>{{$track.Name}}</td>
+                    <td>{{$track.CarCount}}</td>
+                    <td>{{$track.UserCount}}</td>
+                    <td>{{$track.SpectatorCount}}</td>
+                    <td>{{$track.Type}}</td>
+                    <td>{{$track.Description}}</td>
+                </tr>
+            {{end}}
+        </table>
+    </div>
+    <div id="bottomNavDiv">
+        <div id="selectTrackDiv">
+            <input id="selectTrackButton" type="button" value="Select Track" style="margin: 10px;" disabled>
+        </div>
+    </div>
+    
+</div>
