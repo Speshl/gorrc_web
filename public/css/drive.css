@@ -30,9 +30,10 @@ tbody {
     text-align: center;
     padding: 20px;
     width: 65vw;
+    height: 65vh;
     margin: 0 auto;
     border: 1px solid;
-    aspect-ratio: 16/9;
+    /* aspect-ratio: 16/9;  */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -57,7 +58,7 @@ tbody {
     width: 0vw;
     /* margin: 0 auto;
     border: 1px solid; */
-    aspect-ratio: 16/9;
+    /* aspect-ratio: 16/9; */
     visibility: hidden;
 }
 
@@ -66,9 +67,13 @@ tbody {
     visibility: hidden;
 }
 
+#canvasDiv {
+    height: 100%;
+}
+
 #videoCanvas {
-    width: 100%;
-    aspect-ratio: 16/9;
+    height: 100%;
+    /* aspect-ratio: 16/9; */
 }
 
 #infoContainer {

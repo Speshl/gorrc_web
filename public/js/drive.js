@@ -79,7 +79,7 @@ function startConnecting(trackName, carName){
         if (camPlayer.gotRemoteDescription() && state !== null) {
             camPlayer.sendState(state);
         }
-    }, 17); //Update at 60hz
+    }, 33); //Update at 30hz
 }
 
 

@@ -1,3 +1,8 @@
+const dataChannelOptions = {
+    ordered: false, // do not guarantee order
+    maxRetransmits: 0, // in milliseconds
+  };
+
 class CamPlayer {
     constructor() {
         this.socket = io();
@@ -5,6 +10,7 @@ class CamPlayer {
         this.lastVolume = 0;
         this.timesToShowVolume = 0;
         
+        this.hud = null;
         this.gotAnswer = false;
 
         this.pc = new RTCPeerConnection({
@@ -13,8 +19,9 @@ class CamPlayer {
             }]
         })
 
-        this.dataChannel = this.pc.createDataChannel("command");
-        this.hudChannel = this.pc.createDataChannel("hud");
+        this.dataChannel = this.pc.createDataChannel("command",dataChannelOptions);
+        this.hudChannel = this.pc.createDataChannel("hud",dataChannelOptions);
+        this.pingChannel = this.pc.createDataChannel("ping",dataChannelOptions);
     }
 
     setupListeners(carName) {
@@ -84,8 +91,11 @@ class CamPlayer {
                 el.addEventListener("loadeddata", () => {
                     const canvas = document.getElementById('videoCanvas');
                     const videoElement = document.getElementById('videoElement');
+                    const mainContainer = document.getElementById('mainContainer');
                     canvas.width = videoElement.videoWidth;
                     canvas.height = videoElement.videoHeight;
+                    canvas.style.aspectRatio = canvas.width / canvas.height;
+                    mainContainer.style.aspectRatio = canvas.width / canvas.height;
                     
                     console.log("Canvas Size: ",canvas.width, canvas.height);
                     drawVideo();
@@ -165,8 +175,16 @@ class CamPlayer {
         });
 
         this.hudChannel.addEventListener("message", (event) => {
-            const decodedHud = JSON.parse(atob(event.data));
-            console.log(decodedHud);
+            this.hud = JSON.parse(atob(event.data));
+        });
+
+        this.pingChannel.addEventListener("open", (event) => {
+            console.log("ping channel opened");
+        });
+
+        this.pingChannel.addEventListener("message", (event) => {
+            console.log("sending back ping");
+            this.pingChannel.send(event.data);
         });
 
     }
@@ -184,6 +202,7 @@ class CamPlayer {
     }
 
     sendState(state) {
+        //console.log("send command");
         this.dataChannel.send(JSON.stringify(state));
     }
 
@@ -235,24 +254,24 @@ function drawVideo() {
     const videoContext = canvas.getContext('2d');
     const videoElement = document.getElementById('videoElement');
 
-    const audioElement = document.getElementById('audioElement');
-    let currentVolume = audioElement.volume;
+    //const audioElement = document.getElementById('audioElement');
+    // let currentVolume = audioElement.volume;
 
-    const escAndGear = document.getElementById('escAndGear').innerHTML;
-    const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
-    const panAndTilt = document.getElementById('panAndTilt').innerHTML;
-    const combined = escAndGear + " " +steerAndTrim + " "+ panAndTilt;
+    // const escAndGear = document.getElementById('escAndGear').innerHTML;
+    // const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
+    // const panAndTilt = document.getElementById('panAndTilt').innerHTML;
+    // const combined = escAndGear + " " +steerAndTrim + " "+ panAndTilt;
 
-    videoContext.drawImage(videoElement, 0, 0, 320,180); //TODO Make this dynamic
+    videoContext.drawImage(videoElement, 0, 0, canvas.width,canvas.height); //TODO Make this dynamic
 
-    videoContext.fillStyle = "white";
-    videoContext.font = "10px monospace";
+    // videoContext.fillStyle = "white";
+    // videoContext.font = "10px monospace";
 
-    if(camPlayer.showVolume(currentVolume)){
-        videoContext.fillText("Volume: "+currentVolume, 140, 150)
-    }
+    // if(camPlayer.showVolume(currentVolume)){
+    //     videoContext.fillText("Volume: "+currentVolume, 140, 150)
+    // }
 
-    videoContext.fillText(combined, 10, 175);
+    //videoContext.fillText(combined, 10, 175);
     window.requestAnimationFrame(drawVideo);
 }
 

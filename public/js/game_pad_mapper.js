@@ -82,6 +82,7 @@ class GamePadMapper {
         return {
             "axes": this.axes,
             "bit_buttons": this.bitButtons,
+            "time_stamp": Date.now(),
         }
     }
 
