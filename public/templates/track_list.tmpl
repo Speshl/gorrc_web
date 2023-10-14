@@ -5,7 +5,8 @@
             <tr>
                 <th colspan=2>Track</th>
                 <th>Cars</th>
-                <th>Drivers</th>
+                <th>Seats</th>
+                <th>Users</th>
                 <th>Spectators</th>
                 <th>Type</th>
                 <th>Description</th>
@@ -17,6 +18,7 @@
                     </td>
                     <td>{{$track.Name}}</td>
                     <td>{{$track.CarCount}}</td>
+                    <td>{{$track.SeatCount}}</td>
                     <td>{{$track.UserCount}}</td>
                     <td>{{$track.SpectatorCount}}</td>
                     <td>{{$track.Type}}</td>
@@ -27,7 +29,7 @@
     </div>
     <div id="bottomNavDiv">
         <div id="selectTrackDiv">
-            <input id="selectTrackButton" type="button" value="Select Track" style="margin: 10px;" disabled>
+            <input id="selectTrackButton" type="button" value="Go To Track" style="margin: 10px;" disabled>
         </div>
     </div>
     

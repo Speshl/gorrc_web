@@ -3,7 +3,6 @@ package socketio
 import (
 	"log"
 
-	"github.com/google/uuid"
 	socketio "github.com/googollee/go-socket.io"
 )
 
@@ -24,16 +23,18 @@ func (s *SocketIOServer) onError(socketConn socketio.Conn, err error) {
 func (s *SocketIOServer) RemoveClient(id string) {
 	log.Printf("Removing Client: %s\n", id)
 	//Should only match one of the types of connections, but not sure which so check both
-	carId := s.CarConns.Disconnect(id)
-	if carId != uuid.Nil {
-		//do anything related to removing a car from the connections
-	} else {
-		userId := s.UserConns.Disconnect(id)
-		if userId == uuid.Nil { //id wasn't a car or a user
-			log.Printf("error: socketio conn %s was not a car or a user\n", id)
-		} else {
-			//do anything related to disconnecting a user
-			s.CarConns.clearUser(userId)
-		}
+	_, err := s.CarConns.Disconnect(id)
+	if err == nil {
+		log.Printf("socketio conn %s was a car and was removed\n", id)
+		return
 	}
+
+	userId, err := s.UserConns.Disconnect(id)
+	if err == nil {
+		log.Printf("socketio conn %s was a user and was removed\n", id)
+		s.CarConns.ClearUser(userId)
+		return
+	}
+
+	log.Printf("error: socketio conn %s was neither a car or a user\n", id)
 }

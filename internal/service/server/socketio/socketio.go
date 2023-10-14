@@ -16,8 +16,8 @@ import (
 
 type SocketIOServer struct {
 	socketio  *socketio.Server
-	UserConns *Connections
-	CarConns  *Connections
+	UserConns *UserConnections
+	CarConns  *CarConnections
 	store     v1gorrc.StoreAPI
 	cfg       SocketIOServerCfg
 }
@@ -43,8 +43,8 @@ func NewSocketServer(cfg SocketIOServerCfg, store v1gorrc.StoreAPI) *SocketIOSer
 
 	return &SocketIOServer{
 		socketio:  socketioServer,
-		UserConns: NewConnections(),
-		CarConns:  NewConnections(),
+		UserConns: NewUserConnections(),
+		CarConns:  NewCarConnections(),
 		store:     store,
 		cfg:       cfg,
 	}
@@ -77,7 +77,7 @@ func (s *SocketIOServer) StartHealthChecker(ctx context.Context) {
 				log.Printf("stopping health checker: %s\n", ctx.Err())
 				return
 			case <-healthTicker.C:
-				s.CarConns.removeUnhealthy()
+				s.CarConns.RemoveUnhealthy()
 				//s.UserConns.removeUnhealthy() TODO: Need health checks for user?
 			}
 		}

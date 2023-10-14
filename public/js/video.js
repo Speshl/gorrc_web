@@ -6,12 +6,10 @@ const dataChannelOptions = {
 class CamPlayer {
     constructor() {
         this.socket = io();
-
-        this.lastVolume = 0;
-        this.timesToShowVolume = 0;
-        
+        this.volume = 1.0;
         this.hud = null;
         this.gotAnswer = false;
+        this.gotFirstAudio = false; //TEMP, second audio track overwrites first
 
         this.pc = new RTCPeerConnection({
             iceServers: [{
@@ -24,7 +22,7 @@ class CamPlayer {
         this.pingChannel = this.pc.createDataChannel("ping",dataChannelOptions);
     }
 
-    setupListeners(carName) {
+    setupListeners(carName, seatNumber) {
         this.pc.onicecandidateerror = e => {
             //log("ICE Candidate Error: "+JSON.stringify(e))
             console.log("Connection State: "+JSON.stringify(e))
@@ -34,7 +32,7 @@ class CamPlayer {
         this.pc.onconnectionstatechange = e => {
             //log("Connection State: "+pc.iceConnectionState)
             console.log("Connection State: "+this.pc.iceGatheringState)
-            document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
+            //document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
         }
         
         this.pc.onicegatheringstatechange = e => {
@@ -46,7 +44,7 @@ class CamPlayer {
         this.pc.oniceconnectionstatechange = e => {
             //log("Ice Connection State: "+pc.iceConnectionState)
             console.log("Ice Connection State: "+this.pc.iceConnectionState)
-            document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
+            document.getElementById('statusMsg').innerHTML = this.pc.iceGatheringState;
         }
 
         this.pc.onicecandidate = event => {
@@ -55,6 +53,7 @@ class CamPlayer {
                 let carOffer = {
                     offer: this.pc.localDescription,
                     car_name: carName,
+                    seat_number: seatNumber,
                 }
                 this.socket.emit('offer', btoa(JSON.stringify(carOffer)));
             } else{
@@ -98,27 +97,33 @@ class CamPlayer {
                     mainContainer.style.aspectRatio = canvas.width / canvas.height;
                     
                     console.log("Canvas Size: ",canvas.width, canvas.height);
-                    drawVideo();
+                    this.drawVideo();
                 });
 
 
                 console.log("Video Track Added");
             }else{
-                console.log("Creating Audio Track");
-                const volumeSlider = document.getElementById('streamVolume');
-                const el = document.getElementById('audioElement');
-                el.srcObject = event.streams[0];
-                el.autoplay = true;
-                el.muted = false;
-                el.playsinline = true;
-                el.controls = false;
-                el.volume = volumeSlider.value/100;
-                this.lastVolume = volumeSlider.value/100;
+                if (this.gotFirstAudio == false) {
+                    console.log("Creating Audio Track");
+                    const volumeSlider = document.getElementById('streamVolume');
+                    const el = document.getElementById('audioElement');
+                    el.srcObject = event.streams[0];
+                    el.autoplay = true;
+                    el.muted = false;
+                    el.playsinline = true;
+                    el.controls = false;
+                    el.volume = volumeSlider.value/100;
+                    this.volume = volumeSlider.value/100;
+                    this.gotFirstAudio = true; //TODO: Figure out better way to get proper audio track
 
-                volumeSlider.addEventListener('input', (e) => {
-                    el.volume = e.target.value/100;
-                })
-                console.log("Audio Track Added");
+                    volumeSlider.addEventListener('input', (e) => {
+                        this.volume = e.target.value/100;
+                        el.volume = this.volume;
+                    })
+                    console.log("Audio Track Added");
+                }
+
+                
             }
             
         }
@@ -138,7 +143,7 @@ class CamPlayer {
                 .then(() => {
                     this.gotAnswer = true;
                     console.log("Set Remote Description");
-                    console.log(JSON.stringify(this.pc.remoteDescription));
+                   // console.log(JSON.stringify(this.pc.remoteDescription));
                 })
                 .catch((error) => {
                     document.getElementById('statusMsg').innerHTML = "ERROR";
@@ -189,30 +194,19 @@ class CamPlayer {
 
     }
 
-    showVolume(volume) {
-        if(volume != this.lastVolume){
-            this.lastVolume = volume;
-            this.timesToShowVolume = 60;
-        }
-        if(this.timesToShowVolume > 0){
-            this.timesToShowVolume--;
-            return true;
-        }
-        return false;
-    }
-
     sendState(state) {
         //console.log("send command");
         this.dataChannel.send(JSON.stringify(state));
     }
 
-    sendConnect(trackName, carName) {
-        this.setupListeners(carName);
+    sendConnect(trackName, carName, seatNumber) {
+        this.setupListeners(carName, seatNumber);
 
         let user = {
             "token": getCookie("GORRC_Token"),
             "requested_car": carName,
-            "requested_track": trackName
+            "requested_track": trackName,
+            "requested_seat": seatNumber,
         }
         this.socket.emit('user_connect', btoa(JSON.stringify(user)));
     }
@@ -230,7 +224,10 @@ class CamPlayer {
         try{
             if(navigator.mediaDevices != null){
                 const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaStream.getTracks().forEach(track => this.pc.addTrack(track, mediaStream));
+                mediaStream.getTracks().forEach(track => {
+                    this.pc.addTrack(track, mediaStream);
+                    console.log("added media track");
+                });
             }else{
                 console.log("No media devices found");
             }
@@ -247,32 +244,37 @@ class CamPlayer {
     gotRemoteDescription() {
         return this.gotAnswer;
     }
-}
 
-function drawVideo() {
-    const canvas = document.getElementById('videoCanvas');
-    const videoContext = canvas.getContext('2d');
-    const videoElement = document.getElementById('videoElement');
+    drawVideo() {
+        const canvas = document.getElementById('videoCanvas');
+        const videoContext = canvas.getContext('2d');
+        const videoElement = document.getElementById('videoElement');
+    
+        let Line1 = ""
+        let Line2 = ""
 
-    //const audioElement = document.getElementById('audioElement');
-    // let currentVolume = audioElement.volume;
+        if (this.hud !== null && this.hud.lines !== null) {
+            if(this.hud.lines.length >= 1){
+                Line1 = this.hud.lines[0];
+            }
+            if(this.hud.lines.length >= 2){
+                Line2 = this.hud.lines[1];
+            }
+        }
 
-    // const escAndGear = document.getElementById('escAndGear').innerHTML;
-    // const steerAndTrim = document.getElementById('steerAndTrim').innerHTML;
-    // const panAndTilt = document.getElementById('panAndTilt').innerHTML;
-    // const combined = escAndGear + " " +steerAndTrim + " "+ panAndTilt;
-
-    videoContext.drawImage(videoElement, 0, 0, canvas.width,canvas.height); //TODO Make this dynamic
-
-    // videoContext.fillStyle = "white";
-    // videoContext.font = "10px monospace";
-
-    // if(camPlayer.showVolume(currentVolume)){
-    //     videoContext.fillText("Volume: "+currentVolume, 140, 150)
-    // }
-
-    //videoContext.fillText(combined, 10, 175);
-    window.requestAnimationFrame(drawVideo);
+        //Add volume to line 2
+        Line1 += " | Vol:"+this.volume
+        
+    
+        videoContext.drawImage(videoElement, 0, 0, canvas.width,canvas.height); //TODO Make this dynamic
+    
+        videoContext.fillStyle = "blue";
+        videoContext.font = "bold 12px monospace";
+    
+        videoContext.fillText(Line1, 5, 10, canvas.width-10);
+        videoContext.fillText(Line2, 5, canvas.height-10, canvas.width-10);
+        window.requestAnimationFrame(this.drawVideo.bind(this));
+    }
 }
 
 function getCookie(name) {

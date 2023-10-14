@@ -24,4 +24,12 @@ type UserConnect struct {
 type Offer struct {
 	Offer        webrtc.SessionDescription `json:"offer"`
 	CarShortName string                    `json:"car_name"`
+	SeatNum      int                       `json:"seat_number"`
+}
+
+type DriveReqBody struct {
+	TrackShortName string `json:"track_short_name"`
+	CarShortName   string `json:"car_short_name"`
+	SeatNumber     string `json:"seat_number"`
+	Password       string `json:"password"`
 }

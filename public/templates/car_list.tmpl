@@ -4,22 +4,26 @@
         <table>
             <tr>
                 <th colspan=2>Car</th>
-                <th>Status</th>
-                <th>Type</th>
+                <th>Seat #</th>
+                <th>Seat Type</th>
+                <th>Seat Status</th>
+                <th>Car Type</th>
                 <th>Password</th>
                 <th>Description</th>
             </tr>
             {{range $i, $car := .Cars}}
-                {{if eq $car.Status "available" }}
-                    <tr id="carEntry{{$i}}" onclick="selectCar(this);" hx-get="/car_select?track={{$car.TrackShortName}}&car={{$car.ShortName}}" hx-target="#selectCarDiv" hx-swap="outerHTML" hx-trigger="carSelected">
+                {{if eq $car.SeatStatus "available" }}
+                    <tr id="carEntry{{$i}}" onclick="selectCar(this);" hx-get="/car_select?track={{$car.TrackShortName}}&car={{$car.CarShortName}}&seat={{$car.SeatNumber}}" hx-target="#selectCarDiv" hx-swap="outerHTML" hx-trigger="carSelected">
                 {{else}}
                     <tr id="carEntry{{$i}}">
                 {{end}}        
                         <td  style="text-align: left;">
-                            <img class="tracklogo" src="{{$car.Logo}}" alt="gopher driving">
+                            <img class="tracklogo" src="{{$car.Logo}}">
                         </td>
                         <td>{{$car.Name}}</td>
-                        <td>{{$car.Status}}</td>
+                        <td>{{$car.SeatNumber}}</td>
+                        <td>{{$car.SeatType}}</td>
+                        <td>{{$car.SeatStatus}}</td>
                         <td>{{$car.Type}}</td>
                         <td>{{$car.HasPassword}}</td>
                         <td>{{$car.Description}}</td>
@@ -28,11 +32,11 @@
         </table>
     </div>
     <div id="bottomNavDiv">
-        <div id="backTrackList">
-            <input id="changeTrackButton" type="button" value="Change Track" hx-get="/track_list" hx-target="#mainContainer" hx-swap="innerHTML"  style="margin: 10px;">
-        </div>
         <div id="selectCarDiv">
             <input id="selectCarButton" type="button" value="Select Car" style="margin: 10px;" disabled>
+        </div>
+        <div id="backTrackList">
+            <input id="changeTrackButton" type="button" value="Change Track" hx-get="/track_list" hx-target="#mainContainer" hx-swap="innerHTML"  style="margin: 10px;">
         </div>
     </div>
 </div>

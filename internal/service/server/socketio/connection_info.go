@@ -1,70 +1,17 @@
 package socketio
 
-import "github.com/google/uuid"
+// //Returns [uuid]count
+// func (c *Connections) GetActiveTracks() map[uuid.UUID]int {
+// 	c.lock.RLock()
+// 	defer c.lock.RUnlock()
 
-func (c *Connections) GetKeyByCarId(carId uuid.UUID) string {
-	c.lock.RLock()
-	defer c.lock.RUnlock()
-
-	for i := range c.connections {
-		if c.connections[i].Car.Id == carId {
-			return i
-		}
-	}
-	return ""
-}
-
-func (c *Connections) GetKeyByCarShortName(name string) string {
-	c.lock.RLock()
-	defer c.lock.RUnlock()
-
-	for i := range c.connections {
-		if c.connections[i].Car == nil {
-			continue
-		}
-		if c.connections[i].Car.ShortName == name {
-			return i
-		}
-	}
-	return ""
-}
-
-//Returns [uuid]count
-func (c *Connections) GetActiveTracks() map[uuid.UUID]int {
-	c.lock.RLock()
-	defer c.lock.RUnlock()
-
-	activeTracks := make(map[uuid.UUID]int, len(c.connections))
-	for i := range c.connections {
-		trackUUID := c.connections[i].Track.Id
-		activeTracks[trackUUID] += 1
-	}
-	return activeTracks
-}
-
-func (c *Connections) GetActiveCarIds() []uuid.UUID {
-	c.lock.RLock()
-	defer c.lock.RUnlock()
-
-	activeCarIds := make([]uuid.UUID, len(c.connections))
-	for i := range c.connections {
-		activeCarIds = append(activeCarIds, c.connections[i].Car.Id)
-	}
-	return activeCarIds
-}
-
-func (c *Connections) GetOccupiedCarIds() []uuid.UUID {
-	c.lock.RLock()
-	defer c.lock.RUnlock()
-
-	occupiedCarIds := make([]uuid.UUID, len(c.connections))
-	for i := range c.connections {
-		if c.connections[i].User != nil {
-			occupiedCarIds = append(occupiedCarIds, c.connections[i].Car.Id)
-		}
-	}
-	return occupiedCarIds
-}
+// 	activeTracks := make(map[uuid.UUID]int, len(c.connections))
+// 	for i := range c.connections {
+// 		trackUUID := c.connections[i].Track.Id
+// 		activeTracks[trackUUID] += 1
+// 	}
+// 	return activeTracks
+// }
 
 // func (s *SocketIOServer) getUserConnByName(name string) *UserConnection {
 // 	s.userLock.RLock()

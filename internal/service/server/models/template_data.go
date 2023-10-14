@@ -9,15 +9,20 @@ type TrackListTMPLData struct {
 	Tracks []TrackTMPLData
 }
 
-type TrackTMPLData struct {
-	Name           string
-	ShortName      string
-	Type           string
-	Logo           string
-	Description    string
+type TrackData struct {
 	CarCount       int
+	SeatCount      int
 	UserCount      int
 	SpectatorCount int
+}
+
+type TrackTMPLData struct {
+	TrackData
+	Name        string
+	ShortName   string
+	Type        string
+	Logo        string
+	Description string
 }
 
 func (a TrackListTMPLData) Len() int      { return len(a.Tracks) }
@@ -42,21 +47,23 @@ type CarListTMPLData struct {
 type CarTMPLData struct {
 	UserId         string
 	Name           string
-	ShortName      string
+	CarShortName   string
 	Type           string
 	Logo           string
 	Description    string
 	TrackShortName string
 	HasPassword    bool
-	Status         string
+	SeatStatus     string
+	SeatNumber     int
+	SeatType       string
 }
 
 func (a CarListTMPLData) Len() int      { return len(a.Cars) }
 func (a CarListTMPLData) Swap(i, j int) { a.Cars[i], a.Cars[j] = a.Cars[j], a.Cars[i] }
 func (a CarListTMPLData) Less(i, j int) bool {
-	if StatusToInt(a.Cars[i].Status) < StatusToInt(a.Cars[j].Status) {
+	if StatusToInt(a.Cars[i].SeatStatus) < StatusToInt(a.Cars[j].SeatStatus) {
 		return true
-	} else if StatusToInt(a.Cars[i].Status) == StatusToInt(a.Cars[j].Status) {
+	} else if StatusToInt(a.Cars[i].SeatStatus) == StatusToInt(a.Cars[j].SeatStatus) {
 		return strings.Compare(a.Cars[i].Name, a.Cars[j].Name) == -1
 	}
 	return false
@@ -70,9 +77,10 @@ type DriveButtonTMPLData struct {
 }
 
 type VideoTMPLData struct {
-	UserId    string
-	TrackName string
-	CarName   string
+	UserId     string
+	TrackName  string
+	CarName    string
+	SeatNumber int
 }
 
 type LoginTMPLData struct {

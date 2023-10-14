@@ -121,13 +121,13 @@ func (s *Server) RegisterHTTPHandlers() {
 
 func (s *Server) ParseHTMLTemplates() {
 	s.templates = make(map[string]*template.Template)
-	s.templates["car_list"] = template.Must(template.ParseFiles("internal/service/server/templates/car_list.tmpl"))
-	s.templates["car_select"] = template.Must(template.ParseFiles("internal/service/server/templates/car_select.tmpl"))
-	s.templates["main"] = template.Must(template.ParseFiles("internal/service/server/templates/main.tmpl"))
-	s.templates["login_or_register"] = template.Must(template.ParseFiles("internal/service/server/templates/login_or_register.tmpl"))
-	s.templates["track_list"] = template.Must(template.ParseFiles("internal/service/server/templates/track_list.tmpl"))
-	s.templates["track_select"] = template.Must(template.ParseFiles("internal/service/server/templates/track_select.tmpl"))
-	s.templates["video"] = template.Must(template.ParseFiles("internal/service/server/templates/video.tmpl"))
-	s.templates["register"] = template.Must(template.ParseFiles("internal/service/server/templates/register.tmpl"))
-	s.templates["register_success"] = template.Must(template.ParseFiles("internal/service/server/templates/register_success.tmpl"))
+	s.templates["car_list"] = template.Must(template.ParseFiles("public/templates/car_list.tmpl"))
+	s.templates["car_select"] = template.Must(template.ParseFiles("public/templates/car_select.tmpl"))
+	s.templates["main"] = template.Must(template.ParseFiles("public/templates/main.tmpl"))
+	s.templates["login_or_register"] = template.Must(template.ParseFiles("public/templates/login_or_register.tmpl"))
+	s.templates["track_list"] = template.Must(template.ParseFiles("public/templates/track_list.tmpl"))
+	s.templates["track_select"] = template.Must(template.ParseFiles("public/templates/track_select.tmpl"))
+	s.templates["video"] = template.Must(template.ParseFiles("public/templates/video.tmpl"))
+	s.templates["register"] = template.Must(template.ParseFiles("public/templates/register.tmpl"))
+	s.templates["register_success"] = template.Must(template.ParseFiles("public/templates/register_success.tmpl"))
 }

@@ -27,17 +27,17 @@ type CarsAPI interface {
 }
 
 type Car struct {
-	Id          uuid.UUID      `db:"id"`
-	Name        string         `db:"name"`
-	ShortName   string         `db:"short_name"`
-	Type        string         `db:"type"`
-	Logo        string         `db:"logo"`
-	Description string         `db:"description"`
-	CreatedAt   time.Time      `db:"created_at"`
-	UpdatedAt   time.Time      `db:"updated_at"`
-	DeletedAt   sql.NullTime   `db:"deleted_at"`
-	Track       uuid.UUID      `db:"track"`
-	Password    sql.NullString `db:"password"`
+	Id          uuid.UUID    `db:"id"`
+	Name        string       `db:"name"`
+	ShortName   string       `db:"short_name"`
+	Type        string       `db:"type"`
+	SeatCount   int          `db:"seat_count"`
+	Logo        string       `db:"logo"`
+	Description string       `db:"description"`
+	CreatedAt   time.Time    `db:"created_at"`
+	UpdatedAt   time.Time    `db:"updated_at"`
+	DeletedAt   sql.NullTime `db:"deleted_at"`
+	Track       uuid.UUID    `db:"track"`
 }
 
 func (s *Store) CreateCar(ctx context.Context, car Car) error {
@@ -49,13 +49,13 @@ func (s *Store) CreateCar(ctx context.Context, car Car) error {
 			"name",
 			"short_name",
 			"type",
+			"seat_count",
 			"logo",
 			"description",
 			// "created_at",
 			// "updated_at",
 			// "deleted_at",
 			"track",
-			"password",
 		).Record(car)
 
 	if err := ctx.Err(); err != nil {

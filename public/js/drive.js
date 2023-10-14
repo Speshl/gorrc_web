@@ -41,22 +41,21 @@ function selectCar(el) {
     }
 }
 
-function driveCar(el,trackName, carName) {
-    htmx.trigger("#"+el.id, "driveCar");
-    document.body.addEventListener("startconnecting", () =>{
-        startConnecting(trackName, carName);
-    })
-}
+// function driveCar(el,trackName, carName, seatNumber) {
+//     htmx.trigger("#"+el.id, "driveCar");
+//     document.body.addEventListener("startconnecting", () =>{
+//         startConnecting(trackName, carName, seatNumber);
+//     })
+// }
 
-function startConnecting(trackName, carName){
+function startConnecting(trackName, carName, seatNumber){
     const camPlayer = new CamPlayer();
     
     setTimeout(() => {
-        // camPlayer.startMicrophone().then(() => {
-        //     camPlayer.sendOffer();
-        // });
-        //camPlayer.sendOffer();
-        camPlayer.sendConnect(trackName, carName);
+        camPlayer.startMicrophone().then(() => {
+            camPlayer.sendConnect(trackName, carName, seatNumber);
+        });
+        //camPlayer.sendConnect(trackName, carName, seatNumber);
     }, 1000);
     
 
@@ -79,9 +78,13 @@ function startConnecting(trackName, carName){
         if (camPlayer.gotRemoteDescription() && state !== null) {
             camPlayer.sendState(state);
         }
-    }, 33); //Update at 30hz
+    }, 10); //Update at 100hz
 }
 
+//Setup htmx event listeners
+document.body.addEventListener("startconnecting", (e) =>{
+    startConnecting(e.detail.track, e.detail.car, e.detail.seat);
+})
 
 //Startup all the processes we need
 toggleDarkMode();

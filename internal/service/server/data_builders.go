@@ -19,10 +19,10 @@ func (s *Server) GetTrackList(ctx context.Context) (models.TrackListTMPLData, er
 	}
 
 	//Get all the track IDs that currently have connected users
-	userTrackIds := s.socketIOServer.UserConns.GetActiveTracks()
+	userTrackIds := s.socketIOServer.UserConns.GetDataForActiveTracks()
 
 	//get a map of tracks with connected cars
-	carTrackIds := s.socketIOServer.CarConns.GetActiveTracks()
+	carTrackIds := s.socketIOServer.CarConns.GetDataForActiveTracks()
 
 	//build array with all the data
 	sortTrackList := make([]models.TrackTMPLData, 0, len(allTracks))
@@ -34,8 +34,11 @@ func (s *Server) GetTrackList(ctx context.Context) (models.TrackListTMPLData, er
 			//Logo:        allTracks[i].Logo,
 			Logo:        "./img/golang_drive.png", //TODO Dynamic logo
 			Description: allTracks[i].Description,
-			UserCount:   userTrackIds[allTracks[i].Id],
-			CarCount:    carTrackIds[allTracks[i].Id],
+			TrackData: models.TrackData{
+				UserCount: userTrackIds[allTracks[i].Id].UserCount,
+				CarCount:  carTrackIds[allTracks[i].Id].CarCount,
+				SeatCount: carTrackIds[allTracks[i].Id].SeatCount,
+			},
 		})
 	}
 
@@ -62,46 +65,59 @@ func (s *Server) GetCarListForTrack(ctx context.Context, trackId uuid.UUID) (mod
 		return returnValue, fmt.Errorf("error getting track: %w", err)
 	}
 
-	//check which cars are currently connected
-	activeCarKeys := s.socketIOServer.CarConns.GetActiveCarIds()
-
-	//check which cars are currently occupied
-	occupiedCarKeys := s.socketIOServer.CarConns.GetOccupiedCarIds()
-
 	//build array with all the data
 	sortCarList := make([]models.CarTMPLData, 0, len(trackCars))
 	for i := range trackCars {
-		carToAdd := models.CarTMPLData{
-			Name:      trackCars[i].Name,
-			ShortName: trackCars[i].ShortName,
-			Type:      trackCars[i].Type,
-			//Logo:        allTracks[i].Logo,
-			Logo:           "./img/golang_drive.png", //TODO Dynamic logo
-			Description:    trackCars[i].Description,
-			HasPassword:    trackCars[i].Password.Valid,
-			TrackShortName: track.ShortName,
+
+		//check which cars are currently occupied
+		seatStatuses, err := s.socketIOServer.CarConns.GetSeatStatusByCarId(trackCars[i].Id)
+		if err != nil {
+			//log.Printf("error: failed getting seat status for car %s, skipping...\n", trackCars[i].Name)
+			continue
 		}
 
-		if contains(occupiedCarKeys, trackCars[i].Id) {
-			carToAdd.Status = "occupied"
-		} else if contains(activeCarKeys, trackCars[i].Id) {
-			carToAdd.Status = "available"
-		} else {
-			carToAdd.Status = "unavailable"
+		carKey, err := s.socketIOServer.CarConns.GetKeyByCarId(trackCars[i].Id)
+		if err != nil {
+			continue
 		}
-		sortCarList = append(sortCarList, carToAdd)
+
+		password, err := s.socketIOServer.CarConns.GetPassword(carKey)
+		if err != nil {
+			continue
+		}
+
+		hasPassword := false
+		if password != "" {
+			hasPassword = true
+		}
+
+		//Add an entry in the car list per seat
+		for j := range seatStatuses {
+			seatType := "driver"
+			if j > 0 {
+				seatType = "passenger"
+			}
+
+			carToAdd := models.CarTMPLData{
+				Name:         trackCars[i].Name,
+				CarShortName: trackCars[i].ShortName,
+				Type:         trackCars[i].Type,
+				//Logo:        allTracks[i].Logo,
+				Logo:           "./img/golang_drive.png", //TODO Dynamic logo
+				Description:    trackCars[i].Description,
+				HasPassword:    hasPassword,
+				TrackShortName: track.ShortName,
+				SeatNumber:     j,
+				SeatStatus:     seatStatuses[j],
+				SeatType:       seatType,
+			}
+
+			sortCarList = append(sortCarList, carToAdd)
+		}
+
 	}
 	returnValue.Cars = sortCarList
 
 	sort.Sort(returnValue)
 	return returnValue, nil
-}
-
-func contains(s []uuid.UUID, e uuid.UUID) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }

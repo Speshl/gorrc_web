@@ -55,12 +55,12 @@ class GamePadMapper {
         let mappedBrake = this.mapToRange(myGamePad.buttons[6].value, 0.0, 1.0, -1.0, 1.0);
 
 
-        this.axes[0] = Math.round(myGamePad.axes[0] * 1000) / 1000; //Steering
-        this.axes[1] = Math.round(mappedThrottle * 1000) / 1000; //Throttle
-        this.axes[2] = Math.round(mappedBrake * 1000) / 1000; //Brake
-        this.axes[3] = Math.round(myGamePad.axes[2] * 1000) / 1000; //Pan
-        this.axes[4] = Math.round(myGamePad.axes[3] * 1000) / 1000; //Tilt
-        this.axes[5] = Math.round(myGamePad.axes[1] * 1000) / 1000; //Unused
+        this.axes[0] = Math.round(myGamePad.axes[0] * 100) / 100; //Steering
+        this.axes[1] = Math.round(mappedThrottle * 100) / 100; //Throttle
+        this.axes[2] = Math.round(mappedBrake * 100) / 100; //Brake
+        this.axes[3] = Math.round(myGamePad.axes[2] * 100) / 100; //Pan
+        this.axes[4] = Math.round(myGamePad.axes[3] * 100) / 100; //Tilt
+        this.axes[5] = Math.round(myGamePad.axes[1] * 100) / 100; //Unused
 
         this.setBit(0, myGamePad.buttons[14].pressed);//steering left trim
         this.setBit(1, myGamePad.buttons[15].pressed);//steering right trim
@@ -75,6 +75,8 @@ class GamePadMapper {
         this.setBit(25, myGamePad.buttons[2].pressed);//unused
         this.setBit(26, myGamePad.buttons[3].pressed);//unused
         this.setBit(27, myGamePad.buttons[10].pressed);//unused
+
+        console.log("Initial: " + myGamePad.buttons[7].value + " Mapped: "+ mappedThrottle +" Final: " + this.axes[1]);
         return true;
     }
 
@@ -99,6 +101,6 @@ class GamePadMapper {
     }
 
     mapToRange(value, min, max, minReturn, maxReturn) {
-        return Math.floor((maxReturn - minReturn) * (value - min) / (max - min) + minReturn)
+        return (maxReturn - minReturn) * (value - min) / (max - min) + minReturn;
     }
 }

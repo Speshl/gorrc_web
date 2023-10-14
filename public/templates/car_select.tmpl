@@ -1,0 +1,15 @@
+<div id="selectCarDiv">
+    <form hx-post="/drive" hx-ext='json-enc' hx-target="#mainContainer" hx-swap="outerHTML">
+        {{if ne .CarShortName ""}}
+            {{if eq .HasPassword true}}
+                <input id="selectCarPassword" type="password" placeholder="Car Password" name="password" required>
+            {{end}}
+            <input type="hidden" name="car_short_name" value={{.CarShortName}}>
+            <input type="hidden" name="track_short_name" value={{.TrackShortName}}>
+            <input type="hidden" name="seat_number" value={{.SeatNumber}}>
+            <button id="selectCarButton" type="submit"style="margin: 10px;">Control Car</button>
+        {{else}}
+            <button id="selectCarButton" type="submit" style="margin: 10px;" disabled>Control Car</button>
+        {{end}}
+    </form>
+</div>

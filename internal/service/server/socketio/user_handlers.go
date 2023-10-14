@@ -15,33 +15,33 @@ func (s *SocketIOServer) ConnectUser(socketConn socketio.Conn, msg string) {
 	details := models.UserConnect{}
 	err := decode(msg, &details)
 	if err != nil {
-		log.Printf("failed decoding connect user event msg - %s\n", err.Error())
+		log.Printf("error: failed decoding connect user event msg - %s\n", err.Error())
 		return
 	}
 
 	userName, err := auth.ValidateJWT(details.Token)
 	if err != nil {
-		log.Printf("failed validating token on socket connect user: %s\n", err.Error())
+		log.Printf("error: failed validating token on socket connect user: %s\n", err.Error())
 		return
 	}
 
 	user, err := s.store.GetUserByUserName(context.Background(), userName)
 	if err != nil {
-		log.Printf("error getting user from database - %s\n", err.Error())
+		log.Printf("error: failed getting user from database - %s\n", err.Error())
 		return
 	}
 
 	log.Printf("user %s connected", user.UserName)
 
 	s.UserConns.NewUserConnection(socketConn, user)
-	s.UserConns.emit(socketConn.ID(), "connected")
+	s.UserConns.Emit(socketConn.ID(), "connected")
 }
 
 func (s *SocketIOServer) HealthyUser(socketConn socketio.Conn, msg string) {
 	health := ""
 	err := decode(msg, &health)
 	if err != nil {
-		log.Printf("failed decoding healthy user event msg - %s\n", err.Error())
+		log.Printf("error: failed decoding healthy user event msg - %s\n", err.Error())
 		return
 	}
 	log.Printf("%s user health: %s\n", socketConn.ID(), health)
@@ -52,64 +52,57 @@ func (s *SocketIOServer) OnUserOffer(socketConn socketio.Conn, msg string) {
 	offer := models.Offer{}
 	err := decode(msg, &offer)
 	if err != nil {
-		log.Printf("offer from %s failed unmarshaling: %s\n", socketConn.ID(), string(msg))
+		log.Printf("error: offer from %s failed unmarshaling: %s\n", socketConn.ID(), err.Error())
 		return
 	}
 
 	//check if the car exists
-	carKey := s.CarConns.GetKeyByCarShortName(offer.CarShortName)
-	car := s.CarConns.getCar(carKey)
-	if car == nil {
-		log.Printf("no car found for carshortname %s with carKey %s\n", offer.CarShortName, carKey)
+	carKey, err := s.CarConns.GetKeyByCarShortName(offer.CarShortName)
+	if err != nil {
+		log.Printf("error: car not found with shortname %s\n", offer.CarShortName)
 		return
 	}
 
-	track := s.CarConns.getTrack(carKey)
-	if track == nil {
-		log.Printf("no track found for carshortname %s with carKey %s\n", offer.CarShortName, carKey)
+	car, err := s.CarConns.GetCar(carKey)
+	if err != nil {
+		log.Printf("error: no car found for car shortname %s with carKey %s\n", offer.CarShortName, carKey)
 		return
 	}
 
-	user := s.UserConns.getUser(socketConn.ID())
-	if user == nil {
-		log.Printf("no user found in userConns: %s\n", socketConn.ID())
+	track, err := s.CarConns.GetTrack(carKey)
+	if err != nil {
+		log.Printf("error: no track found for car shortname %s with carKey %s\n", offer.CarShortName, carKey)
 		return
 	}
-	s.UserConns.setCar(socketConn.ID(), car)
-	s.UserConns.setTrack(socketConn.ID(), track)
+
+	user, err := s.UserConns.GetUser(socketConn.ID())
+	if err != nil {
+		log.Printf("error: no connection found for user: %s\n", socketConn.ID())
+		return
+	}
+
+	err = s.UserConns.SetCar(socketConn.ID(), car, offer.SeatNum)
+	if err != nil {
+		log.Printf("error: failed setting car for user: %s\n", err.Error())
+		return
+	}
+
+	err = s.UserConns.SetTrack(socketConn.ID(), track)
+	if err != nil {
+		log.Printf("error: failed setting track for user: %s\n", err.Error())
+		return
+	}
 
 	encodedOffer, err := encode(offer)
 	if err != nil {
-		log.Printf("failed encoding offer: %s\n", err.Error())
+		log.Printf("error: failed encoding offer: %s\n", err.Error())
 		return
 	}
 
-	log.Printf("user %s sending offer to car %s @ %s\n", user.UserName, car.Name, track.Name)
-	s.CarConns.emit(carKey, "offer", encodedOffer)
-	log.Printf("user %s sent offer to car %s @ %s\n", user.UserName, car.Name, track.Name)
+	log.Printf("user %s sending offer to car %s @ %s seat %d\n", user.UserName, car.Name, track.Name, offer.SeatNum)
+	s.CarConns.Emit(carKey, "offer", encodedOffer)
 }
 
 func (s *SocketIOServer) OnUserCandidate(socketConn socketio.Conn, msg string) {
 	log.Printf("User Candidate Recieved (%s): %s\n", socketConn.ID(), msg)
-	// carOffer := CarOffer{}
-	// err := decode(msg, &carOffer)
-	// if err != nil {
-	// 	log.Printf("Offer from %s failed unmarshaling: %s\n", socketConn.ID(), string(msg))
-	// 	return
-	// }
-
-	// //check if the car exists
-	// carConn := s.getCarConnByName(carOffer.CarName)
-
-	// s.userLock.Lock()
-	// userConn, ok := s.userConnections[socketConn.ID()]
-	// if !ok {
-	// 	log.Printf("user for id %s is missing from user connections\n", socketConn.ID())
-	// 	return
-	// }
-	// userConn.RequestedCar = carOffer.CarName
-	// s.userLock.Unlock()
-
-	// log.Printf("Sending offer to car: %s\n", carConn.Connection.Socket.ID())
-	// carConn.Connection.Socket.Emit("offer", msg)
 }

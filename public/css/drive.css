@@ -12,6 +12,7 @@ html {
 
 h1 {
     text-align: center;
+    padding: 20px;
 }
 
 h3 {
@@ -29,11 +30,11 @@ tbody {
 #mainContainer {
     text-align: center;
     padding: 20px;
-    width: 65vw;
-    height: 65vh;
+    /* width: 65vw; */
+    height: 50vh;
     margin: 0 auto;
     border: 1px solid;
-    /* aspect-ratio: 16/9;  */
+    aspect-ratio: 16/9; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -78,7 +79,7 @@ tbody {
 
 #infoContainer {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 5px;
     margin-top: 20px;
 }
@@ -100,8 +101,18 @@ tbody {
     width: 100%;
 }
 
+#logOutDiv {
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
  #selectTrackDiv {
-    display: inline-block
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 } 
 
 #carList {
@@ -113,18 +124,24 @@ tbody {
 
 #selectCarDiv {
     display: inline-block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
 
 #backTrackList {
     display: inline-block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
 }
 
-#bottomNavDiv {
+/* #bottomNavDiv {
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-}
+} */
 
 .tracklogo {
     width: 50px;
@@ -144,11 +161,6 @@ tbody {
 .infoItem {
     padding: 5px;
     text-align: center;
-}
-
-.hiddenInfoItem {
-    visibility: hidden;
-    display: none;
 }
 
 .list {

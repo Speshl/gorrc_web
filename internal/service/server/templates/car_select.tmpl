@@ -1,7 +1,0 @@
-<div id="selectCarDiv">
-    {{if ne .ShortName ""}}
-        <input id="selectCarButton" type="button" value="Select Car" onclick="driveCar(this,{{.TrackShortName}},{{.ShortName}});" hx-get="/drive?track={{.TrackShortName}}&car={{.ShortName}}" hx-target="#mainContainer" hx-swap="outerHTML"  style="margin: 10px;">
-    {{else}}
-        <input id="selectCarButton" type="button" value="Select Car" style="margin: 10px;" disabled>
-    {{end}}
-</div>
