@@ -75,7 +75,7 @@ class KeyPressMapper {
         this.setBit(20, this.pressedKeys['m']);//client volume mute
         this.setBit(21, this.pressedKeys[']']);//client volume up
         this.setBit(22, this.pressedKeys['[']);//client volume down
-        return true;
+        return "keyboard";
     }
 
     getState() {

@@ -115,6 +115,7 @@ func (s *Server) loginHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	log.Println("setting user token")
 	w.Header().Set("Token", tokenString)
 	http.SetCookie(w, &http.Cookie{
 		Name:    auth.TokenName,
@@ -135,7 +136,6 @@ func (s *Server) loginHandler(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func (s *Server) showRegisterHandler(w http.ResponseWriter, req *http.Request) {

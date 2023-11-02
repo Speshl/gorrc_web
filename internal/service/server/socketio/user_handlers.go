@@ -93,6 +93,8 @@ func (s *SocketIOServer) OnUserOffer(socketConn socketio.Conn, msg string) {
 		return
 	}
 
+	offer.UserId = user.Id
+
 	encodedOffer, err := encode(offer)
 	if err != nil {
 		log.Printf("error: failed encoding offer: %s\n", err.Error())
@@ -104,5 +106,59 @@ func (s *SocketIOServer) OnUserOffer(socketConn socketio.Conn, msg string) {
 }
 
 func (s *SocketIOServer) OnUserCandidate(socketConn socketio.Conn, msg string) {
-	log.Printf("User Candidate Recieved (%s): %s\n", socketConn.ID(), msg)
+	//log.Printf("User Candidate Recieved (%s): %s\n", socketConn.ID(), msg)
+
+	iceCandidate := models.IceCandidate{}
+	err := decode(msg, &iceCandidate)
+	if err != nil {
+		log.Printf("error: iceCandidate from %s failed unmarshaling: %s\n", socketConn.ID(), err.Error())
+		return
+	}
+
+	//check if the car exists
+	carKey, err := s.CarConns.GetKeyByCarShortName(iceCandidate.CarShortName)
+	if err != nil {
+		log.Printf("error: car not found with shortname %s\n", iceCandidate.CarShortName)
+		return
+	}
+
+	car, err := s.CarConns.GetCar(carKey)
+	if err != nil {
+		log.Printf("error: no car found for car shortname %s with carKey %s\n", iceCandidate.CarShortName, carKey)
+		return
+	}
+
+	track, err := s.CarConns.GetTrack(carKey)
+	if err != nil {
+		log.Printf("error: no track found for car shortname %s with carKey %s\n", iceCandidate.CarShortName, carKey)
+		return
+	}
+
+	user, err := s.UserConns.GetUser(socketConn.ID())
+	if err != nil {
+		log.Printf("error: no connection found for user: %s\n", socketConn.ID())
+		return
+	}
+
+	err = s.UserConns.SetCar(socketConn.ID(), car, iceCandidate.SeatNum)
+	if err != nil {
+		log.Printf("error: failed setting car for user: %s\n", err.Error())
+		return
+	}
+
+	err = s.UserConns.SetTrack(socketConn.ID(), track)
+	if err != nil {
+		log.Printf("error: failed setting track for user: %s\n", err.Error())
+		return
+	}
+
+	iceCandidate.UserId = user.Id
+	encodedIceCandidate, err := encode(iceCandidate)
+	if err != nil {
+		log.Printf("error: failed encoding iceCandidate: %s\n", err.Error())
+		return
+	}
+
+	log.Printf("user %s sending ice candidate to car %s @ %s seat %d\n", user.UserName, car.Name, track.Name, iceCandidate.SeatNum)
+	s.CarConns.Emit(carKey, "candidate", encodedIceCandidate)
 }

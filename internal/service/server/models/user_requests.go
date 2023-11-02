@@ -1,6 +1,9 @@
 package models
 
-import "github.com/pion/webrtc/v3"
+import (
+	"github.com/google/uuid"
+	"github.com/pion/webrtc/v3"
+)
 
 type Credentials struct {
 	Password string `json:"password"`
@@ -21,10 +24,18 @@ type UserConnect struct {
 	Token          string `json:"token"`
 }
 
+type IceCandidate struct {
+	Candidate    webrtc.ICECandidateInit `json:"candidate"`
+	CarShortName string                  `json:"car_name"`
+	SeatNum      int                     `json:"seat_number"`
+	UserId       uuid.UUID               `json:"user_id"`
+}
+
 type Offer struct {
 	Offer        webrtc.SessionDescription `json:"offer"`
 	CarShortName string                    `json:"car_name"`
 	SeatNum      int                       `json:"seat_number"`
+	UserId       uuid.UUID                 `json:"user_id"`
 }
 
 type DriveReqBody struct {

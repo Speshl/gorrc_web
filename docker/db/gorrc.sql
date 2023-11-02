@@ -34,7 +34,7 @@ CREATE TABLE `cars` (
   `short_name` varchar(10) NOT NULL,
   `logo` varchar(45) NOT NULL,
   `type` varchar(45) NOT NULL,
-  `num_seats` int NOT NULL,
+  `seat_count` int NOT NULL,
   `description` varchar(45) NOT NULL,
   `created_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated_at` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
@@ -43,12 +43,9 @@ CREATE TABLE `cars` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`),
   UNIQUE KEY `short_name_UNIQUE` (`short_name`),
-  KEY `idx_cars_for_track` (`track`,`type`,`name`)
+  KEY `idx_cars_for_track` (`track` ASC, `type` ASC, `name` ASC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
-ALTER TABLE `gorrc`.`cars` 
-ADD INDEX `idx_cars_for_track` (`track` ASC, `type` ASC, `name` ASC) VISIBLE;
 
 CREATE TABLE `track_x_owner` (
   `track` varchar(36) NOT NULL,

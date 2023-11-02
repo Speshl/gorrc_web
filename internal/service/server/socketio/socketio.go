@@ -64,6 +64,7 @@ func (s *SocketIOServer) RegisterSocketIOHandlers() {
 	s.socketio.OnEvent("/", "user_healthy", s.HealthyUser)
 
 	s.socketio.OnEvent("/", "offer", s.OnUserOffer)
+	s.socketio.OnEvent("/", "candidate", s.OnUserCandidate)
 	s.socketio.OnEvent("/", "answer", s.OnCarAnswer)
 
 }

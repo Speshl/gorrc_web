@@ -41,13 +41,6 @@ function selectCar(el) {
     }
 }
 
-// function driveCar(el,trackName, carName, seatNumber) {
-//     htmx.trigger("#"+el.id, "driveCar");
-//     document.body.addEventListener("startconnecting", () =>{
-//         startConnecting(trackName, carName, seatNumber);
-//     })
-// }
-
 function startConnecting(trackName, carName, seatNumber){
     const camPlayer = new CamPlayer();
     
@@ -63,16 +56,25 @@ function startConnecting(trackName, carName, seatNumber){
     const keyPressMapper = new KeyPressMapper();
     
     //Start listener loop for input commands
+    var controllerName = "";
     setInterval(() => {
         let gamePad = gamePadMapper.getGamePad();
 
         let state = null;
+        let newControllerName = "";
         if(gamePad != null){
-            gamePadMapper.syncState(gamePad);
+            newControllerName = gamePadMapper.syncState(gamePad);
             state = gamePadMapper.getState();
+           
         }else{
-            keyPressMapper.syncState();
+            newControllerName = keyPressMapper.syncState();
             state = keyPressMapper.getState();
+        }
+
+        if(newControllerName !== controllerName){
+            controllerName = newControllerName;
+            const controllerType = document.getElementById('controllerType');
+            controllerType.innerHTML = controllerName;
         }
 
         if (camPlayer.gotRemoteDescription() && state !== null) {

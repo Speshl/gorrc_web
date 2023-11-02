@@ -9,40 +9,6 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 )
 
-// func (s *SocketIOServer) OnConnect(socketConn socketio.Conn) error {
-// 	log.Printf("socketio connected %s - Local: %s - Remote: %s\n", socketConn.ID(), socketConn.LocalAddr().String(), socketConn.RemoteAddr().String())
-// 	// id := socketConn.ID()
-
-// 	// Create a new Client for the connected socket
-// 	// conn, err := s.NewClientConn(socketConn)
-// 	// if err != nil {
-// 	// 	return fmt.Errorf("failed creating new client: %w", err)
-// 	// }
-
-// 	// s.connectionsLock.Lock()
-// 	// s.baseConnections[id] = conn
-// 	// s.connectionsLock.Unlock()
-// 	return nil
-// }
-
-// func (s *SocketIOServer) OnDisconnect(socketConn socketio.Conn, reason string) {
-// 	log.Printf("socketio connection disconnected (%s): %s\n", reason, socketConn.ID())
-// 	s.RemoveClient(socketConn.ID())
-// }
-
-// func (s *SocketIOServer) OnError(socketConn socketio.Conn, err error) {
-// 	log.Println("Got Error")
-// 	log.Printf("Error: %s", err.Error())
-// 	// 	log.Printf("Id:%s", socketConn.ID())
-// 	// 	log.Printf("socketio connection %s error: %s\n", socketConn.ID(), err.Error())
-// }
-
-// func (s *SocketIOServer) OnICECandidate(socketConn socketio.Conn, msg []byte) {
-// 	log.Printf("candidate recieved from client: %s", socketConn.ID())
-// }
-
-//Custom events below
-
 // TODO: Make sure replace current car conn with same id if exists
 func (s *SocketIOServer) ConnectCar(socketConn socketio.Conn, msg string) {
 	log.Printf("connect car event ID: %s", socketConn.ID())
@@ -67,7 +33,7 @@ func (s *SocketIOServer) ConnectCar(socketConn socketio.Conn, msg string) {
 	}
 
 	if details.SeatCount < 1 || details.SeatCount > car.SeatCount {
-		log.Printf("car %s requested connection with more seats than it supports: %d\n", car.ShortName, car.SeatCount)
+		log.Printf("car %s requested connection with more seats than it supports: %d<%d\n", car.ShortName, car.SeatCount, details.SeatCount)
 		return
 	}
 

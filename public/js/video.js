@@ -26,39 +26,44 @@ class CamPlayer {
         this.pc.onicecandidateerror = e => {
             //log("ICE Candidate Error: "+JSON.stringify(e))
             console.log("Connection State: "+JSON.stringify(e))
-            document.getElementById('statusMsg').innerHTML = "ERROR";
+            //document.getElementById('statusMsg').innerHTML = "ERROR";
         }
         
         this.pc.onconnectionstatechange = e => {
             //log("Connection State: "+pc.iceConnectionState)
-            console.log("Connection State: "+this.pc.iceGatheringState)
-            //document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
+            console.log("Connection State: "+ this.pc.connectionState)
+            document.getElementById('statusMsg').innerHTML = this.pc.connectionState;
         }
         
         this.pc.onicegatheringstatechange = e => {
             //log("Ice Gathering State: "+pc.iceConnectionState)
             console.log("Ice Gathering State: "+this.pc.iceGatheringState)
-            //document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
+            document.getElementById('statusMsg').innerHTML = +this.pc.iceGatheringState;
         }
         
         this.pc.oniceconnectionstatechange = e => {
             //log("Ice Connection State: "+pc.iceConnectionState)
             console.log("Ice Connection State: "+this.pc.iceConnectionState)
-            document.getElementById('statusMsg').innerHTML = this.pc.iceGatheringState;
+            document.getElementById('statusMsg').innerHTML = this.pc.iceConnectionState;
         }
 
         this.pc.onicecandidate = event => {
             if (event.candidate === null) {
-                console.log("Emmiting offer");
-                let carOffer = {
-                    offer: this.pc.localDescription,
+                // console.log("Emmiting offer");
+                // let carOffer = {
+                //     offer: this.pc.localDescription,
+                //     car_name: carName,
+                //     seat_number: seatNumber,
+                // }
+                // this.socket.emit('offer', btoa(JSON.stringify(carOffer)));
+            } else{
+                console.log("Found Candidate");
+                let iceCandidate = {
+                    candidate: event.candidate,
                     car_name: carName,
                     seat_number: seatNumber,
                 }
-                this.socket.emit('offer', btoa(JSON.stringify(carOffer)));
-            } else{
-                console.log("Found Candidate");
-                this.socket.emit('candidate', btoa(JSON.stringify(event.candidate)));
+                this.socket.emit('candidate', btoa(JSON.stringify(iceCandidate)));
             }
         }
         
@@ -168,7 +173,7 @@ class CamPlayer {
 
         this.socket.on('connected', () => {
             console.log("Got connected");
-            this.sendOffer();
+            this.sendOffer(carName, seatNumber);
         });
 
         this.dataChannel.addEventListener("open", (event) => {
@@ -188,7 +193,7 @@ class CamPlayer {
         });
 
         this.pingChannel.addEventListener("message", (event) => {
-            console.log("sending back ping");
+            //console.log("sending back ping");
             this.pingChannel.send(event.data);
         });
 
@@ -196,7 +201,11 @@ class CamPlayer {
 
     sendState(state) {
         //console.log("send command");
-        this.dataChannel.send(JSON.stringify(state));
+        if(this.dataChannel.readyState === "open"){
+            this.dataChannel.send(JSON.stringify(state));
+        }else{
+            console.log("Data channel not open: " + this.dataChannel.readyState);
+        }   
     }
 
     sendConnect(trackName, carName, seatNumber) {
@@ -211,13 +220,19 @@ class CamPlayer {
         this.socket.emit('user_connect', btoa(JSON.stringify(user)));
     }
 
-    sendOffer() {
+    sendOffer(carName, seatNumber) {
         document.getElementById('statusMsg').innerHTML = "Sending Offer...";
-        this.pc.createOffer().then(d => this.pc.setLocalDescription(d)).catch();
-    }
-
-    sendOfferWithDelay(delay) {
-        setTimeout(this.sendOffer(),delay);
+        this.pc.createOffer().then(d => {
+            this.pc.setLocalDescription(d).then(() => {
+                console.log("Emmiting offer");
+                let carOffer = {
+                    offer: this.pc.localDescription,
+                    car_name: carName,
+                    seat_number: seatNumber,
+                }
+                this.socket.emit('offer', btoa(JSON.stringify(carOffer)));
+            })
+        }).catch();
     }
 
     async startMicrophone() {
@@ -268,11 +283,16 @@ class CamPlayer {
     
         videoContext.drawImage(videoElement, 0, 0, canvas.width,canvas.height); //TODO Make this dynamic
     
-        videoContext.fillStyle = "blue";
-        videoContext.font = "bold 12px monospace";
-    
-        videoContext.fillText(Line1, 5, 10, canvas.width-10);
-        videoContext.fillText(Line2, 5, canvas.height-10, canvas.width-10);
+        videoContext.fillStyle = "white";
+        videoContext.strokeStyle = 'black';
+        videoContext.font = "14px impact";
+        videoContext.lineWidth = 1;
+        
+        videoContext.textAlign = "center";
+        videoContext.strokeText(Line1, canvas.width/2, 15, canvas.width-10);
+        videoContext.fillText(Line1, canvas.width/2, 15, canvas.width-10);
+        videoContext.strokeText(Line2, canvas.width/2, canvas.height-10, canvas.width-10);
+        videoContext.fillText(Line2, canvas.width/2, canvas.height-10, canvas.width-10);
         window.requestAnimationFrame(this.drawVideo.bind(this));
     }
 }
