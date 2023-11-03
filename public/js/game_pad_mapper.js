@@ -73,7 +73,7 @@ class GamePadMapper {
 
     syncState(myGamePad) {
         if (myGamePad != null) {
-            gamePadName = this.isSupportedGamepad(myGamePad.id);
+            let gamePadName = this.isSupportedGamepad(myGamePad.id);
             switch(gamePadName){
                 case "xbox":
                     return this.syncWithXbox(myGamePad);
@@ -251,7 +251,8 @@ class GamePadMapper {
 
     isSupportedGamepad(gamePadId) {
         if (gamePadId != null) {
-            if (gamePadId.toLowerCase().includes("xbox") || gamePadId.toLowerCase().includes("0b20") || gamePadId.toLowerCase().includes("0207") || gamePadId.toLowerCase().includes("1532")) {
+            if (gamePadId.toLowerCase().includes("xbox") || gamePadId.toLowerCase().includes("0b20") || //xbox one
+                gamePadId.toLowerCase().includes("045e") || gamePadId.toLowerCase().includes("0b05")) { //xbox elite
                 return "xbox";
             }else if(gamePadId.toLowerCase().includes("Dualshock") || gamePadId.toLowerCase().includes("054C") || gamePadId.toLowerCase().includes("09cc")) {
                 return "dualshock";
