@@ -251,7 +251,7 @@ class GamePadMapper {
 
     isSupportedGamepad(gamePadId) {
         if (gamePadId != null) {
-            if (gamePadId.toLowerCase().includes("xbox") || gamePadId.toLowerCase().includes("0b20")) {
+            if (gamePadId.toLowerCase().includes("xbox") || gamePadId.toLowerCase().includes("0b20") || gamePadId.toLowerCase().includes("0207") || gamePadId.toLowerCase().includes("1532")) {
                 return "xbox";
             }else if(gamePadId.toLowerCase().includes("Dualshock") || gamePadId.toLowerCase().includes("054C") || gamePadId.toLowerCase().includes("09cc")) {
                 return "dualshock";
